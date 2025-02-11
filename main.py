@@ -74,7 +74,7 @@ def main():
     elapsed_time = 0
 
 # 12. Establish heart list, count, and increment
-    heart_add_increment = 700   # Add a Heart every 1 second
+    heart_add_increment = 500   # Add a Heart every 1 second
     heart_count = 0
     hearts = []   # List of Hearts
 
@@ -136,8 +136,8 @@ def main():
         missed_hearts = [heart for heart in hearts if heart[1] >= HEIGHT]   # Check hearts that are missed (out of bounds)
         for heart in missed_hearts:
             heart_x, heart_y, heart_type = heart
-            if heart_type != "broken":  # Only penalize for non-broken hearts
-                score -= 1
+            if heart_type == "normal" or heart_type == "golden":  # Only penalize for non-broken hearts
+                score -= 3
 
         hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Remove hearts that went out of bounds
         score = max(0, score) 
