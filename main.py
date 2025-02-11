@@ -26,13 +26,19 @@ HEART_VEL = 5   # Speed at which the Heart moves
 BG = pygame.image.load("content/redbackground.jpg")
 BG = pygame.transform.scale(BG, (WIDTH, HEIGHT))
 
+# 16. Set Font
+FONT = pygame.font.SysFont("comicsans", 50)
+
 # 6. Draw Function
-def draw(player_x, hearts):
+def draw(player_x, hearts, score):
     WIN.blit(BG, (0, 0))
     WIN.blit(PLAYER_IMAGE, (player_x, HEIGHT - PLAYER_HEIGHT)) # Starts Player at the bottom
 
     for heart_x, heart_y in hearts:
         WIN.blit(HEART_IMAGE, (heart_x, heart_y))
+
+    score_text = FONT.render(f"Score: {score}", 1, (255, 255, 255))
+    WIN.blit(score_text, (10,10))
 
     pygame.display.update()
 
@@ -51,6 +57,9 @@ def main():
     heart_add_increment = 1000   # Add a Heart every 1 second
     heart_count = 0
     hearts = []   # List of Hearts
+
+# 17. Establish Score
+    score = 0
 
     while run:
 
@@ -82,7 +91,23 @@ def main():
 # 14. Heart Movement
         hearts = [(heart_x, heart_y + HEART_VEL) for heart_x, heart_y in hearts if heart_y < HEIGHT]
 
-        draw(player_x, hearts)
+# 15. Heart Collision
+        player_rect = pygame.Rect(player_x, HEIGHT - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT)
+        before_collision = len(hearts)
+        hearts = [(heart_x, heart_y) for heart_x, heart_y in hearts if not player_rect.colliderect(pygame.Rect(heart_x, heart_y, HEART_WIDTH, HEART_HEIGHT))]
+        after_collision = len(hearts)
+
+# 18. Increase Score by Heart Collided
+        score += before_collision - after_collision 
+
+# 19. Decrease Score by Heart Missed
+        missed_hearts = [heart for heart in hearts if heart[1] >= HEIGHT]   # Adds a heart if heart "Y" is greater than or equal to the screen height
+        score -= len(missed_hearts)   
+        hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Removes heart if heart "Y" is less than the screen height
+        score = max(0, score)  # Score cannot be negative
+
+
+        draw(player_x, hearts, score)
 
     pygame.quit()
 
