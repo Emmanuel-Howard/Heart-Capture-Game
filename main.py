@@ -2,8 +2,10 @@
 # 1. Importing Modules
 import pygame
 import time
-import random   # For Heart position
+import random  
 pygame.init()
+pygame.font.init()
+pygame.mixer.init()
 
 # 2. Create Window
 WIDTH, HEIGHT = 600, 700
@@ -38,6 +40,10 @@ BG = pygame.transform.scale(BG, (WIDTH, HEIGHT))
 # 16. Set Font
 FONT = pygame.font.SysFont("lobster", 50)
 
+# 19. Set Sound
+pygame.mixer.music.load("sound/ifollowrivers.mp3")
+pygame.mixer.music.play(-1)  # -1 plays the music on loop
+
 # 6. Draw Function
 def draw(player_x, hearts, score):
     WIN.blit(BG, (0, 0))
@@ -51,7 +57,7 @@ def draw(player_x, hearts, score):
         elif heart_type == "broken":
             WIN.blit(BROKEN_HEART_IMAGE, (heart_x, heart_y))
 
-    score_text = FONT.render(f"Score: {score}", 1, (255, 215, 0))   
+    score_text = FONT.render(f"Amour de Manu: {score}", 1, (255, 255, 255))   
     WIN.blit(score_text, (10,10))
 
     pygame.display.update()
@@ -73,7 +79,7 @@ def main():
     hearts = []   # List of Hearts
 
 # 17. Establish Score
-    score = 0
+    score = 5
 
     while run:
 
@@ -135,6 +141,16 @@ def main():
 
         hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Remove hearts that went out of bounds
         score = max(0, score) 
+
+# 20. If score reaches 0 (Game Over)
+        if score == 0:
+            pygame.mixer.music.stop()
+
+            lost_text = FONT.render("GAME OVER!", 1, "black")
+            WIN.blit(lost_text, (WIDTH/2 - lost_text.get_width()/2, HEIGHT/2 - lost_text.get_height()/2))
+            pygame.display.update()
+            pygame.time.delay(6000)
+            break
 
 
         draw(player_x, hearts, score)
