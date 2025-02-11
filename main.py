@@ -11,33 +11,47 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("L'Aventure de Cloé")
 
 # 7. Create Player
-PLAYER_WIDTH, PLAYER_HEIGHT = 50, 50
+PLAYER_WIDTH, PLAYER_HEIGHT = 70, 70
 PLAYER_IMAGE = pygame.image.load("content/blondegirlasset1.png")
 PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
-PLAYER_VEL = 8   # Speed at which the Player moves
+PLAYER_VEL = 10   # Speed at which the Player moves
 
 # 11. Create Heart
-HEART_WIDTH, HEART_HEIGHT = 50, 50
-HEART_IMAGE = pygame.image.load("content/whiteheart.png")
+HEART_WIDTH, HEART_HEIGHT = 50, 80
+HEART_IMAGE = pygame.image.load("content/redpixelheart.png")
 HEART_IMAGE = pygame.transform.scale(HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 HEART_VEL = 5   # Speed at which the Heart moves
 
+# 11 (B). Create Golden Heart
+GOLDEN_HEART_IMAGE = pygame.image.load("content/goldenstar.png")
+GOLDEN_HEART_IMAGE = pygame.transform.scale(GOLDEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
+
+# 11 (C). Create Golden Heart
+BROKEN_HEART_IMAGE = pygame.image.load("content/brokenpixelheart.png")
+BROKEN_HEART_IMAGE = pygame.transform.scale(BROKEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
+
+
 # 5. Set Background
-BG = pygame.image.load("content/redbackground.jpg")
+BG = pygame.image.load("content/snowbackground.png")
 BG = pygame.transform.scale(BG, (WIDTH, HEIGHT))
 
 # 16. Set Font
-FONT = pygame.font.SysFont("comicsans", 50)
+FONT = pygame.font.SysFont("lobster", 50)
 
 # 6. Draw Function
 def draw(player_x, hearts, score):
     WIN.blit(BG, (0, 0))
     WIN.blit(PLAYER_IMAGE, (player_x, HEIGHT - PLAYER_HEIGHT)) # Starts Player at the bottom
 
-    for heart_x, heart_y in hearts:
-        WIN.blit(HEART_IMAGE, (heart_x, heart_y))
+    for heart_x, heart_y, heart_type in hearts:
+        if heart_type == "normal":
+            WIN.blit(HEART_IMAGE, (heart_x, heart_y))
+        elif heart_type == "golden":
+            WIN.blit(GOLDEN_HEART_IMAGE, (heart_x, heart_y))
+        elif heart_type == "broken":
+            WIN.blit(BROKEN_HEART_IMAGE, (heart_x, heart_y))
 
-    score_text = FONT.render(f"Score: {score}", 1, (255, 255, 255))
+    score_text = FONT.render(f"Score: {score}", 1, (255, 215, 0))   
     WIN.blit(score_text, (10,10))
 
     pygame.display.update()
@@ -54,7 +68,7 @@ def main():
     elapsed_time = 0
 
 # 12. Establish heart list, count, and increment
-    heart_add_increment = 1000   # Add a Heart every 1 second
+    heart_add_increment = 700   # Add a Heart every 1 second
     heart_count = 0
     hearts = []   # List of Hearts
 
@@ -71,7 +85,10 @@ def main():
         if heart_count >= heart_add_increment:
             for _ in range(1):   # Spawns 1 heart
                 heart_x = random.randint(0, WIDTH - HEART_WIDTH)
-                hearts.append((heart_x, 0))
+
+                heart_type = random.choice(["normal", "golden", "broken"])   # Randomly selects a heart type
+
+                hearts.append((heart_x, 0, heart_type))
                 heart_count = 0
 
         # heart_add_increment = max(500, heart_add_increment -150)                  = Potential Add-On to speed up drop
@@ -89,22 +106,35 @@ def main():
             player_x += PLAYER_VEL   # Move right by velocity
 
 # 14. Heart Movement
-        hearts = [(heart_x, heart_y + HEART_VEL) for heart_x, heart_y in hearts if heart_y < HEIGHT]
-
+        for i, heart in enumerate(hearts): 
+            heart_x, heart_y, heart_type = heart
+            hearts[i] = (heart_x, heart_y + HEART_VEL, heart_type)  # Update "Y" position of heart
+        
 # 15. Heart Collision
-        player_rect = pygame.Rect(player_x, HEIGHT - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT)
-        before_collision = len(hearts)
-        hearts = [(heart_x, heart_y) for heart_x, heart_y in hearts if not player_rect.colliderect(pygame.Rect(heart_x, heart_y, HEART_WIDTH, HEART_HEIGHT))]
-        after_collision = len(hearts)
+        new_hearts = []   # New Heart list
+        for heart in hearts:
+            heart_x, heart_y, heart_type = heart   # Heart Details: x, y, type
+            if player_x < heart_x < player_x + PLAYER_WIDTH and HEIGHT - PLAYER_HEIGHT < heart_y < HEIGHT:  
+                if heart_type == "normal":
+                    score += 1
+                elif heart_type == "golden":
+                    score += 2  
+                elif heart_type == "broken":
+                    score -= 3  
+            else:
+                new_hearts.append(heart)  # Keep heart if not collected
 
-# 18. Increase Score by Heart Collided
-        score += before_collision - after_collision 
+        hearts = new_hearts  # Update the heart list
 
-# 19. Decrease Score by Heart Missed
-        missed_hearts = [heart for heart in hearts if heart[1] >= HEIGHT]   # Adds a heart if heart "Y" is greater than or equal to the screen height
-        score -= len(missed_hearts)   
-        hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Removes heart if heart "Y" is less than the screen height
-        score = max(0, score)  # Score cannot be negative
+# 18. Decrease Score by Heart Missed
+        missed_hearts = [heart for heart in hearts if heart[1] >= HEIGHT]   # Check hearts that are missed (out of bounds)
+        for heart in missed_hearts:
+            heart_x, heart_y, heart_type = heart
+            if heart_type != "broken":  # Only penalize for non-broken hearts
+                score -= 1
+
+        hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Remove hearts that went out of bounds
+        score = max(0, score) 
 
 
         draw(player_x, hearts, score)
