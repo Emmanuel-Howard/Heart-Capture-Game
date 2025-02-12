@@ -16,7 +16,7 @@ pygame.display.set_caption("L'Aventure de Cloé")
 PLAYER_WIDTH, PLAYER_HEIGHT = 70, 70
 PLAYER_IMAGE = pygame.image.load("content/blondegirlasset1.png")
 PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
-PLAYER_VEL = 10   # Speed at which the Player moves
+PLAYER_VEL = 12   # Speed at which the Player moves
 
 # 11. Create Heart
 HEART_WIDTH, HEART_HEIGHT = 60, 90
@@ -54,7 +54,14 @@ FONT = pygame.font.SysFont("lobster", 50)
 
 # 19. Set Sound
 pygame.mixer.music.load("sound/ifollowrivers.mp3")
+pygame.mixer.music.set_volume(0.4)
 pygame.mixer.music.play(-1)  # -1 plays the music on loop
+
+hit_sound = pygame.mixer.Sound("sound/hit sound.MP3")
+hit_sound.set_volume(1.0) 
+
+receive_sound = pygame.mixer.Sound("sound/retro-coin-3-236679.mp3")
+receive_sound.set_volume(0.1)
 
 # 21. Create Menu
 def menu():
@@ -134,7 +141,7 @@ def draw(player_x, hearts, score, current_bg, last_bg_switch_time, bg_switch_int
         elif heart_type == "black":
             WIN.blit(BLACK_HEART_IMAGE, (heart_x, heart_y))
 
-    score_text = FONT.render(f"Amour de Manu: {score}", 1, (255, 255, 255))   
+    score_text = FONT.render(f"Amour de Manu: {score}", 1, "red")   
     WIN.blit(score_text, (10,10))
 
     pygame.display.update()
@@ -153,7 +160,7 @@ def main():
     elapsed_time = 0
 
 # 12. Establish heart list, count, and increment
-    heart_add_increment = 500   # Add a Heart every 0.5 seconds
+    heart_add_increment = 450   # Add a Heart every 0.5 seconds
     heart_count = 0
     hearts = []   # List of Hearts
 
@@ -173,6 +180,7 @@ def main():
         elapsed_time = time.time() - start_time
 
 # 13. Spawn Hearts 
+
         if heart_count >= heart_add_increment:
             for _ in range(1):   # Spawns 1 heart
                 heart_x = random.randint(0, WIDTH - HEART_WIDTH)
@@ -182,7 +190,7 @@ def main():
                 hearts.append((heart_x, 0, heart_type))
                 heart_count = 0
 
-        heart_add_increment = max(500, heart_add_increment -150)  
+        # heart_add_increment = max(500, heart_add_increment -150)  
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -207,11 +215,14 @@ def main():
             heart_x, heart_y, heart_type = heart   # Heart Details: x, y, type
             if player_x < heart_x < player_x + PLAYER_WIDTH and HEIGHT - PLAYER_HEIGHT < heart_y < HEIGHT:  
                 if heart_type == "normal":
+                    receive_sound.play()
                     score += 1
                 elif heart_type == "golden":
+                    receive_sound.play()
                     score += 2  
                 elif heart_type == "broken":
-                    score -= 3  
+                    hit_sound.play()  
+                    score -= 3
                 elif heart_type == "black":
                     score -= 1000000
                 continue
@@ -241,7 +252,7 @@ def main():
             pygame.mixer.music.load("sound/stvalentin game end.mp3")
             pygame.mixer.music.play(1)
 
-            lost_text = FONT.render("GAME OVER!", 1, "red")
+            lost_text = FONT.render("FIN!", 1, "red")
             WIN.blit(lost_text, (WIDTH/2 - lost_text.get_width()/2, HEIGHT/2 - lost_text.get_height()/2))
             pygame.display.update()
             pygame.time.delay(6000)
