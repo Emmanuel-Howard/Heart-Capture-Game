@@ -24,7 +24,7 @@ HEART_IMAGE = pygame.image.load("content/redpixelheart.png")
 HEART_IMAGE = pygame.transform.scale(HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 HEART_VEL = 5   # Speed at which the Heart moves
 
-# 11 (B). Create Golden Heart
+# 11 (B). Create Golden Star
 GOLDEN_HEART_IMAGE = pygame.image.load("content/goldenstar.png")
 GOLDEN_HEART_IMAGE = pygame.transform.scale(GOLDEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
@@ -35,6 +35,10 @@ BROKEN_HEART_IMAGE = pygame.transform.scale(BROKEN_HEART_IMAGE, (HEART_WIDTH, HE
 # 11 (D). Create Black Heart
 BLACK_HEART_IMAGE = pygame.image.load("content/blackheart.png")
 BLACK_HEART_IMAGE = pygame.transform.scale(BLACK_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
+
+# 11 (E). Create Special Heart
+SPECIAL_HEART_IMAGE = pygame.image.load("content/specialheart.png")
+SPECIAL_HEART_IMAGE = pygame.transform.scale(SPECIAL_HEART_IMAGE, (50, 65))
 
 # 5. Set Backgrounds
 BG_1 = pygame.image.load("content/snowbackground.png")
@@ -53,10 +57,7 @@ BG_4 = pygame.transform.scale(BG_4, (WIDTH, HEIGHT))
 FONT = pygame.font.SysFont("lobster", 50)
 
 # 19. Set Sound
-pygame.mixer.music.load("sound/ifollowrivers.mp3")
-pygame.mixer.music.set_volume(0.4)
-pygame.mixer.music.play(-1)  # -1 plays the music on loop
-
+# I'd usually put the main music here but need it in the main() since I'm not creating a game loop
 hit_sound = pygame.mixer.Sound("sound/hit sound.MP3")
 hit_sound.set_volume(1.0) 
 
@@ -82,6 +83,54 @@ def menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     run = False
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
+
+# 23: End Game Screen
+def end_game_screen():
+    end_game_screen = pygame.image.load("content/gameover.png")
+    end_game_screen = pygame.transform.scale(end_game_screen, (WIDTH, HEIGHT))
+
+    run = True
+    while run:
+        WIN.fill((0, 0, 0))
+        WIN.blit(end_game_screen, (0, 0))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    run = False
+                    main()
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
+
+# 24: Win Game Screen
+def win_game_screen():
+    win_game_screen = pygame.image.load("content/wincover.png")
+    win_game_screen = pygame.transform.scale(win_game_screen, (WIDTH, HEIGHT))
+
+    run = True
+    while run:
+        WIN.fill((0, 0, 0))
+        WIN.blit(win_game_screen, (0, 0))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    run = False
+                    main()
                 if event.key == pygame.K_q:
                     pygame.quit()
                     exit()
@@ -140,6 +189,8 @@ def draw(player_x, hearts, score, current_bg, last_bg_switch_time, bg_switch_int
             WIN.blit(BROKEN_HEART_IMAGE, (heart_x, heart_y))
         elif heart_type == "black":
             WIN.blit(BLACK_HEART_IMAGE, (heart_x, heart_y))
+        elif heart_type == "special":
+            WIN.blit(SPECIAL_HEART_IMAGE, (heart_x, heart_y))
 
     score_text = FONT.render(f"Amour de Manu: {score}", 1, "red")   
     WIN.blit(score_text, (10,10))
@@ -168,10 +219,15 @@ def main():
     bg_switch_interval = 15000  # Background switches every 10 seconds
     alpha = 0
 
-# 17. Establish Score
+# 17. Establish Score, current background, and special heart appearance
     score = 5
-
     current_bg = BG_1
+    special_heart_appeared = False
+
+# Sound for loop
+    pygame.mixer.music.load("sound/ifollowrivers.mp3")
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(-1)  # -1 plays the music on loop
 
     while run:
 
@@ -180,17 +236,29 @@ def main():
         elapsed_time = time.time() - start_time
 
 # 13. Spawn Hearts 
-
         if heart_count >= heart_add_increment:
             for _ in range(1):   # Spawns 1 heart
                 heart_x = random.randint(0, WIDTH - HEART_WIDTH)
 
-                heart_type = random.choice(["normal", "golden", "broken", "black"])   # Randomly selects a heart type
+                heart_type = random.choice(["normal", "golden", "broken", "black",])   # Randomly selects a heart type
 
                 hearts.append((heart_x, 0, heart_type))
                 heart_count = 0
 
-        # heart_add_increment = max(500, heart_add_increment -150)  
+# 13 (B). Check for Special Heart
+        if score % 20 == 0 and score != 0 and not special_heart_appeared:  # Special heart appears when score reaches 20
+            special_heart_appeared = True
+            heart_x = random.randint(0, WIDTH - HEART_WIDTH)
+            heart_y = 0
+            hearts.append((heart_x, heart_y, "special"))
+
+# Reset special heart appearance for the next cycle of 20 points
+        if score % 20 == 0 and score != 0 and not special_heart_appeared:
+            special_heart_appeared = True
+            heart_x = random.randint(0, WIDTH - HEART_WIDTH)
+            heart_y = 0
+            hearts.append((heart_x, heart_y, "special"))
+            special_heart_appeared = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -224,7 +292,11 @@ def main():
                     hit_sound.play()  
                     score -= 3
                 elif heart_type == "black":
-                    score -= 1000000
+                    score -= 100000
+                elif heart_type == "special":
+                    score += 100000
+
+
                 continue
             new_hearts.append(heart)  # Keep heart if not collected
 
@@ -246,17 +318,30 @@ def main():
             pygame.mixer.music.load("sound/game-over-arcade-6435.mp3")
             pygame.mixer.music.play(1)
 
+            end_game_screen()
+
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)
 
             pygame.mixer.music.load("sound/stvalentin game end.mp3")
             pygame.mixer.music.play(1)
 
-            lost_text = FONT.render("FIN!", 1, "red")
-            WIN.blit(lost_text, (WIDTH/2 - lost_text.get_width()/2, HEIGHT/2 - lost_text.get_height()/2))
-            pygame.display.update()
-            pygame.time.delay(6000)
-            break
+            end_game_screen()
+
+        if score >= 100000:
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("sound/windoot-96335.mp3")
+            pygame.mixer.music.play(1)
+
+            win_game_screen()
+
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+
+            pygame.mixer.music.load("sound/wingamemessage.mp3")
+            pygame.mixer.music.play(1)
+
+
 
 
         last_bg_switch_time, current_bg, alpha = draw(player_x, hearts, score, current_bg, last_bg_switch_time, bg_switch_interval, alpha)
