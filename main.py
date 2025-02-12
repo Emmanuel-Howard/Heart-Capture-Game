@@ -36,9 +36,18 @@ BROKEN_HEART_IMAGE = pygame.transform.scale(BROKEN_HEART_IMAGE, (HEART_WIDTH, HE
 BLACK_HEART_IMAGE = pygame.image.load("content/blackheart.png")
 BLACK_HEART_IMAGE = pygame.transform.scale(BLACK_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
-# 5. Set Background
-BG = pygame.image.load("content/snowbackground.png")
-BG = pygame.transform.scale(BG, (WIDTH, HEIGHT))
+# 5. Set Backgrounds
+BG_1 = pygame.image.load("content/snowbackground.png")
+BG_1 = pygame.transform.scale(BG_1, (WIDTH, HEIGHT))
+
+BG_2 = pygame.image.load("content/Snow game cover (3).png")
+BG_2 = pygame.transform.scale(BG_2, (WIDTH, HEIGHT))
+
+BG_3 = pygame.image.load("content/Snow game cover (4).png")
+BG_3 = pygame.transform.scale(BG_3, (WIDTH, HEIGHT))
+
+BG_4 = pygame.image.load("content/Snow game cover (5).png")
+BG_4 = pygame.transform.scale(BG_4, (WIDTH, HEIGHT))
 
 # 16. Set Font
 FONT = pygame.font.SysFont("lobster", 50)
@@ -54,6 +63,7 @@ def menu():
 
     run = True
     while run:
+        WIN.fill((0, 0, 0))
         WIN.blit(menu_bg, (0, 0))
 
         pygame.display.update()
@@ -68,10 +78,50 @@ def menu():
                 if event.key == pygame.K_q:
                     pygame.quit()
                     exit()
+                                                                                 # NOTE: I used AI for the FADE-IN EFECT
+# 22. New Backgrounds
+def fade_in_background(old_bg, new_bg, alpha, speed=5):
+    # Create a surface for blending the old and new backgrounds
+    blended_bg = pygame.Surface((WIDTH, HEIGHT))
+    blended_bg.blit(old_bg, (0, 0))
+    blended_bg.set_alpha(alpha)  # Set the alpha (transparency)
+    
+    WIN.blit(blended_bg, (0, 0))  # Draw the old background with transparency
+    WIN.blit(new_bg, (0, 0))  # Draw the new background over it
+    
+    # Gradually increase the alpha value to create the fade effect
+    alpha = min(255, alpha + speed)
+    return new_bg, alpha
 
 # 6. Draw Function
-def draw(player_x, hearts, score):
-    WIN.blit(BG, (0, 0))
+def draw(player_x, hearts, score, current_bg, last_bg_switch_time, bg_switch_interval, alpha):
+
+    global BG_1, BG_2, BG_3, BG_4
+
+    # Get the current time
+    current_time = pygame.time.get_ticks()  # in milliseconds
+
+    # Check if enough time has passed to switch the background
+    if current_time - last_bg_switch_time >= bg_switch_interval:
+        # Update the last background switch time
+        last_bg_switch_time = current_time
+
+        # Switch background based on time
+        if current_time // bg_switch_interval % 4 == 0:
+            new_bg = BG_1
+        elif current_time // bg_switch_interval % 4 == 1:
+            new_bg = BG_2
+        elif current_time // bg_switch_interval % 4 == 2:
+            new_bg = BG_3
+        else:
+            new_bg = BG_4
+
+        current_bg, alpha = fade_in_background(current_bg, new_bg, alpha)
+
+    else:
+        WIN.fill((0, 0, 0))  # Clear screen
+        WIN.blit(current_bg, (0, 0))  # Draw the selected background
+
     WIN.blit(PLAYER_IMAGE, (player_x, HEIGHT - PLAYER_HEIGHT)) # Starts Player at the bottom
 
     for heart_x, heart_y, heart_type in hearts:
@@ -89,6 +139,8 @@ def draw(player_x, hearts, score):
 
     pygame.display.update()
 
+    return last_bg_switch_time, current_bg, alpha
+
 # 3. Main Game Loop
 def main():
     run = True
@@ -101,12 +153,18 @@ def main():
     elapsed_time = 0
 
 # 12. Establish heart list, count, and increment
-    heart_add_increment = 500   # Add a Heart every 1 second
+    heart_add_increment = 500   # Add a Heart every 0.5 seconds
     heart_count = 0
     hearts = []   # List of Hearts
 
+    last_bg_switch_time = 0  # Time of last background switch
+    bg_switch_interval = 15000  # Background switches every 10 seconds
+    alpha = 0
+
 # 17. Establish Score
     score = 5
+
+    current_bg = BG_1
 
     while run:
 
@@ -124,7 +182,7 @@ def main():
                 hearts.append((heart_x, 0, heart_type))
                 heart_count = 0
 
-        # heart_add_increment = max(500, heart_add_increment -150)                  = Potential Add-On to speed up drop
+        heart_add_increment = max(500, heart_add_increment -150)  
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -174,15 +232,23 @@ def main():
 # 20. If score reaches 0 (Game Over)
         if score == 0:
             pygame.mixer.music.stop()
+            pygame.mixer.music.load("sound/game-over-arcade-6435.mp3")
+            pygame.mixer.music.play(1)
 
-            lost_text = FONT.render("GAME OVER!", 1, "black")
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+
+            pygame.mixer.music.load("sound/stvalentin game end.mp3")
+            pygame.mixer.music.play(1)
+
+            lost_text = FONT.render("GAME OVER!", 1, "red")
             WIN.blit(lost_text, (WIDTH/2 - lost_text.get_width()/2, HEIGHT/2 - lost_text.get_height()/2))
             pygame.display.update()
             pygame.time.delay(6000)
             break
 
 
-        draw(player_x, hearts, score)
+        last_bg_switch_time, current_bg, alpha = draw(player_x, hearts, score, current_bg, last_bg_switch_time, bg_switch_interval, alpha)
 
     pygame.quit()
 
