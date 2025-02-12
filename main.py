@@ -19,7 +19,7 @@ PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT
 PLAYER_VEL = 10   # Speed at which the Player moves
 
 # 11. Create Heart
-HEART_WIDTH, HEART_HEIGHT = 50, 80
+HEART_WIDTH, HEART_HEIGHT = 60, 90
 HEART_IMAGE = pygame.image.load("content/redpixelheart.png")
 HEART_IMAGE = pygame.transform.scale(HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 HEART_VEL = 5   # Speed at which the Heart moves
@@ -32,7 +32,6 @@ GOLDEN_HEART_IMAGE = pygame.transform.scale(GOLDEN_HEART_IMAGE, (HEART_WIDTH, HE
 BROKEN_HEART_IMAGE = pygame.image.load("content/brokenpixelheart.png")
 BROKEN_HEART_IMAGE = pygame.transform.scale(BROKEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
-
 # 5. Set Background
 BG = pygame.image.load("content/snowbackground.png")
 BG = pygame.transform.scale(BG, (WIDTH, HEIGHT))
@@ -43,6 +42,28 @@ FONT = pygame.font.SysFont("lobster", 50)
 # 19. Set Sound
 pygame.mixer.music.load("sound/ifollowrivers.mp3")
 pygame.mixer.music.play(-1)  # -1 plays the music on loop
+
+# 21. Create Menu
+def menu():
+    menu_bg = pygame.image.load("content/Snow game cover (2).png")
+    menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
+
+    run = True
+    while run:
+        WIN.blit(menu_bg, (0, 0))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    run = False
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
 
 # 6. Draw Function
 def draw(player_x, hearts, score):
@@ -137,7 +158,7 @@ def main():
         for heart in missed_hearts:
             heart_x, heart_y, heart_type = heart
             if heart_type == "normal" or heart_type == "golden":  # Only penalize for non-broken hearts
-                score -= 3
+                score -= 2
 
         hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Remove hearts that went out of bounds
         score = max(0, score) 
@@ -160,4 +181,5 @@ def main():
 
 # 4. Guard Clause
 if __name__ == "__main__":
+    menu()
     main()
