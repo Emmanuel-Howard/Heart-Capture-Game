@@ -28,9 +28,13 @@ HEART_VEL = 5   # Speed at which the Heart moves
 GOLDEN_HEART_IMAGE = pygame.image.load("content/goldenstar.png")
 GOLDEN_HEART_IMAGE = pygame.transform.scale(GOLDEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
-# 11 (C). Create Golden Heart
+# 11 (C). Create broken Heart
 BROKEN_HEART_IMAGE = pygame.image.load("content/brokenpixelheart.png")
 BROKEN_HEART_IMAGE = pygame.transform.scale(BROKEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
+
+# 11 (D). Create Black Heart
+BLACK_HEART_IMAGE = pygame.image.load("content/blackheart.png")
+BLACK_HEART_IMAGE = pygame.transform.scale(BLACK_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
 # 5. Set Background
 BG = pygame.image.load("content/snowbackground.png")
@@ -77,6 +81,8 @@ def draw(player_x, hearts, score):
             WIN.blit(GOLDEN_HEART_IMAGE, (heart_x, heart_y))
         elif heart_type == "broken":
             WIN.blit(BROKEN_HEART_IMAGE, (heart_x, heart_y))
+        elif heart_type == "black":
+            WIN.blit(BLACK_HEART_IMAGE, (heart_x, heart_y))
 
     score_text = FONT.render(f"Amour de Manu: {score}", 1, (255, 255, 255))   
     WIN.blit(score_text, (10,10))
@@ -113,7 +119,7 @@ def main():
             for _ in range(1):   # Spawns 1 heart
                 heart_x = random.randint(0, WIDTH - HEART_WIDTH)
 
-                heart_type = random.choice(["normal", "golden", "broken"])   # Randomly selects a heart type
+                heart_type = random.choice(["normal", "golden", "broken", "black"])   # Randomly selects a heart type
 
                 hearts.append((heart_x, 0, heart_type))
                 heart_count = 0
@@ -148,8 +154,10 @@ def main():
                     score += 2  
                 elif heart_type == "broken":
                     score -= 3  
-            else:
-                new_hearts.append(heart)  # Keep heart if not collected
+                elif heart_type == "black":
+                    score -= 1000000
+                continue
+            new_hearts.append(heart)  # Keep heart if not collected
 
         hearts = new_hearts  # Update the heart list
 
@@ -157,7 +165,7 @@ def main():
         missed_hearts = [heart for heart in hearts if heart[1] >= HEIGHT]   # Check hearts that are missed (out of bounds)
         for heart in missed_hearts:
             heart_x, heart_y, heart_type = heart
-            if heart_type == "normal" or heart_type == "golden":  # Only penalize for non-broken hearts
+            if heart_type == "normal" or heart_type == "golden":  # Only penalize for non-broken/black hearts
                 score -= 2
 
         hearts = [heart for heart in hearts if heart[1] < HEIGHT]   # Remove hearts that went out of bounds
