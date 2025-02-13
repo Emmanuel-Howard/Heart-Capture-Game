@@ -1,3 +1,18 @@
+# NEED TO: Check spawn on 20, move yellow heart faster, export to .exe
+
+# Bundling into .exe
+import os
+import sys
+
+def resource_path(relative_path):
+    """Get absolute path for bundled files in an .exe."""
+    if getattr(sys, 'frozen', False): 
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 # 1. Importing Modules
 import pygame
@@ -14,7 +29,7 @@ pygame.display.set_caption("L'Aventure de Cloé")
 
 # 7. Create Player
 PLAYER_WIDTH, PLAYER_HEIGHT = 70, 70
-PLAYER_IMAGE = pygame.image.load("content/blondegirlasset1.png")
+PLAYER_IMAGE = pygame.image.load(resource_path("content/blondegirlasset1.png"))
 PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
 PLAYER_VEL = 12   # Speed at which the Player moves
 
