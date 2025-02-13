@@ -1,20 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-import glob
-
-# Get all the files in the 'content' and 'sound' folders
-content_files = glob.glob('content/*')
-sound_files = glob.glob('sound/*')
-
-# Add them to the datas list
-datas = [(file, 'content') for file in content_files] + [(file, 'sound') for file in sound_files]
-
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=datas,
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

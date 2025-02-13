@@ -29,43 +29,43 @@ pygame.display.set_caption("L'Aventure de Cloé")
 
 # 7. Create Player
 PLAYER_WIDTH, PLAYER_HEIGHT = 70, 70
-PLAYER_IMAGE = pygame.image.load(resource_path("content/blondegirlasset1.png"))
+PLAYER_IMAGE = pygame.image.load(resource_path("blondegirlasset1.png"))
 PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT))
 PLAYER_VEL = 12   # Speed at which the Player moves
 
 # 11. Create Heart
 HEART_WIDTH, HEART_HEIGHT = 60, 90
-HEART_IMAGE = pygame.image.load(resource_path("content/redpixelheart.png"))
+HEART_IMAGE = pygame.image.load(resource_path("redpixelheart.png"))
 HEART_IMAGE = pygame.transform.scale(HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 HEART_VEL = 5   # Speed at which the Heart moves
 
 # 11 (B). Create Golden Star
-GOLDEN_HEART_IMAGE = pygame.image.load(resource_path("content/goldenstar.png"))
+GOLDEN_HEART_IMAGE = pygame.image.load(resource_path("goldenstar.png"))
 GOLDEN_HEART_IMAGE = pygame.transform.scale(GOLDEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
 # 11 (C). Create broken Heart
-BROKEN_HEART_IMAGE = pygame.image.load(resource_path("content/brokenpixelheart.png"))
+BROKEN_HEART_IMAGE = pygame.image.load(resource_path("brokenpixelheart.png"))
 BROKEN_HEART_IMAGE = pygame.transform.scale(BROKEN_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
 # 11 (D). Create Black Heart
-BLACK_HEART_IMAGE = pygame.image.load(resource_path("content/blackheart.png"))
+BLACK_HEART_IMAGE = pygame.image.load(resource_path("blackheart.png"))
 BLACK_HEART_IMAGE = pygame.transform.scale(BLACK_HEART_IMAGE, (HEART_WIDTH, HEART_HEIGHT))
 
 # 11 (E). Create Special Heart
-SPECIAL_HEART_IMAGE = pygame.image.load(resource_path("content/specialheart.png"))
+SPECIAL_HEART_IMAGE = pygame.image.load(resource_path("specialheart.png"))
 SPECIAL_HEART_IMAGE = pygame.transform.scale(SPECIAL_HEART_IMAGE, (50, 65))
 
 # 5. Set Backgrounds
-BG_1 = pygame.image.load(resource_path("content/snowbackground.png"))
+BG_1 = pygame.image.load(resource_path("snowbackground.png"))
 BG_1 = pygame.transform.scale(BG_1, (WIDTH, HEIGHT))
 
-BG_2 = pygame.image.load(resource_path("content/Snow game cover (3).png"))
+BG_2 = pygame.image.load(resource_path("Snow game cover (3).png"))
 BG_2 = pygame.transform.scale(BG_2, (WIDTH, HEIGHT))
 
-BG_3 = pygame.image.load(resource_path("content/Snow game cover (4).png"))
+BG_3 = pygame.image.load(resource_path("Snow game cover (4).png"))
 BG_3 = pygame.transform.scale(BG_3, (WIDTH, HEIGHT))
 
-BG_4 = pygame.image.load(resource_path("content/Snow game cover (5).png"))
+BG_4 = pygame.image.load(resource_path("Snow game cover (5).png"))
 BG_4 = pygame.transform.scale(BG_4, (WIDTH, HEIGHT))
 
 # 16. Set Font
@@ -73,15 +73,15 @@ FONT = pygame.font.SysFont("lobster", 50)
 
 # 19. Set Sound
 # I'd usually put the main music here but need it in the main() since I'm not creating a game loop
-hit_sound = pygame.mixer.Sound(resource_path("sound/hit sound.MP3"))
+hit_sound = pygame.mixer.Sound(resource_path("hit sound.MP3"))
 hit_sound.set_volume(1.0) 
 
-receive_sound = pygame.mixer.Sound(resource_path("sound/retro-coin-3-236679.mp3"))
+receive_sound = pygame.mixer.Sound(resource_path("retro-coin-3-236679.mp3"))
 receive_sound.set_volume(0.1)
 
 # 21. Create Menu
 def menu():
-    menu_bg = pygame.image.load(resource_path("content/Snow game cover (2).png"))
+    menu_bg = pygame.image.load(resource_path("Snow game cover (2).png"))
     menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
 
     run = True
@@ -104,7 +104,7 @@ def menu():
 
 # 23: End Game Screen
 def end_game_screen():
-    end_game_screen = pygame.image.load(resource_path("content/gameover.png"))
+    end_game_screen = pygame.image.load(resource_path("gameover.png"))
     end_game_screen = pygame.transform.scale(end_game_screen, (WIDTH, HEIGHT))
 
     run = True
@@ -128,7 +128,7 @@ def end_game_screen():
 
 # 24: Win Game Screen
 def win_game_screen():
-    win_game_screen = pygame.image.load(resource_path("content/wincover.png"))
+    win_game_screen = pygame.image.load(resource_path("wincover.png"))
     win_game_screen = pygame.transform.scale(win_game_screen, (WIDTH, HEIGHT))
 
     run = True
@@ -240,7 +240,7 @@ def main():
     special_heart_appeared = False
 
 # Sound for loop
-    pygame.mixer.music.load(resource_path("sound/ifollowrivers.mp3"))
+    pygame.mixer.music.load(resource_path("ifollowrivers.mp3"))
     pygame.mixer.music.set_volume(0.4)
     pygame.mixer.music.play(-1)  # -1 plays the music on loop
 
@@ -332,7 +332,7 @@ def main():
 # 20. If score reaches 0 (Game Over)
         if score == 0:
             pygame.mixer.music.stop()
-            pygame.mixer.music.load(resource_path("sound/game-over-arcade-6435.mp3"))
+            pygame.mixer.music.load(resource_path("game-over-arcade-6435.mp3"))
             pygame.mixer.music.play(1)
 
             end_game_screen()
@@ -340,14 +340,14 @@ def main():
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)
 
-            pygame.mixer.music.load(resource_path("sound/stvalentin game end.mp3"))
+            pygame.mixer.music.load(resource_path("stvalentin game end.mp3"))
             pygame.mixer.music.play(1)
 
             end_game_screen()
 
         if score >= 100000:
             pygame.mixer.music.stop()
-            pygame.mixer.music.load(resource_path("sound/windoot-96335.mp3"))
+            pygame.mixer.music.load(resource_path("windoot-96335.mp3"))
             pygame.mixer.music.play(1)
 
             win_game_screen()
@@ -355,7 +355,7 @@ def main():
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)
 
-            pygame.mixer.music.load(resource_path("sound/wingamemessage.mp3"))
+            pygame.mixer.music.load(resource_path("wingamemessage.mp3"))
             pygame.mixer.music.play(1)
 
 
