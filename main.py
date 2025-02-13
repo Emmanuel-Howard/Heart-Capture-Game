@@ -1,4 +1,4 @@
-# NEED TO: Check spawn on 20, move yellow heart faster, export to .exe
+# NEED TO: move yellow heart faster, export to .exe
 
 # Bundling into .exe
 import os
@@ -290,7 +290,13 @@ def main():
 # 14. Heart Movement
         for i, heart in enumerate(hearts): 
             heart_x, heart_y, heart_type = heart
-            hearts[i] = (heart_x, heart_y + HEART_VEL, heart_type)  # Update "Y" position of heart
+
+            if heart_type == "special":
+                new_y = heart_y + HEART_VEL + 2
+            else:
+                new_y = heart_y + HEART_VEL
+
+            hearts[i] = (heart_x, new_y, heart_type)  # Update "Y" position of heart
         
 # 15. Heart Collision
         new_hearts = []   # New Heart list
