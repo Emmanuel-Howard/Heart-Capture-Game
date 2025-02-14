@@ -1,4 +1,4 @@
-Heart Capture Game - README
+* Note: All files are in main branch since it was easier to export to .exe (at the time).
 
 # Heart Capture - Game Overview
 
